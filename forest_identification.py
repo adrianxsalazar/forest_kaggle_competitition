@@ -79,14 +79,14 @@ results_dictionary['decision_tree_accuracy']=tree_performance
 numerical_indication_matrix=[1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\
 ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-naive_bayes_activation= False
+naive_bayes_activation= True
 #naive bayes implementation
 if naive_bayes_activation == True:
-    naive_bayes=naive_bayes()
+    naive_bayes_st=naive_bayes()
 
     #classify
     classification_matrix_naive_bayes=\
-    naive_bayes.naive_bayes_classifier(\
+    naive_bayes_st.naive_bayes_classifier(\
     attributes_training,labels_training,attributes_testing,numerical_indication_matrix)
     np.savetxt('naive_bays.csv',classification_matrix_naive_bayes, delimiter=',')
     nb_accuracy=accuracy_score(labels_testing,classification_matrix_naive_bayes)
@@ -177,10 +177,10 @@ feature_selection_attributes_testing, accuracy=True)
 results_dictionary['ann_rfecv_accuracy']=ann_performance_selection
 
 #naive_bayes implementation in new dataset
-naive_bayes_activation_rfecv= False
+naive_bayes_activation_rfecv= True
 #naive bayes implementation
 if naive_bayes_activation_rfecv == True:
-    naive_bayesr_rfecv=naive_bayes()
+    naive_bayes_rfecv=naive_bayes()
     numerical_indication_rfecv=np.array(numerical_indication_matrix)[boolean_filter]
 
     #classify
@@ -189,7 +189,7 @@ if naive_bayes_activation_rfecv == True:
     feature_selection_attributes_training,labels_training,\
     feature_selection_attributes_testing,numerical_indication_matrix)
     naive_rfecv_perf=accuracy_score(labels_testing,classification_matrix_naive_bayes)
-    results_dictionary['naive_bayes_rfecv_accuracy']=ann_performance_selection
+    results_dictionary['naive_bayes_rfecv_accuracy']=naive_rfecv_perf
 
 #Transform result into csv
 with open('results.csv', 'wb') as results:
@@ -199,17 +199,11 @@ with open('results.csv', 'wb') as results:
 
 #Predict the unlabelled data
 forest_test=np.genfromtxt("test.csv", dtype=None ,delimiter=',', skip_header=1)[:,1:]
-print forest_test.shape
 
 #Apply the feature selection filter to the data
 forest_test_feature_selection=forest_test[:,boolean_filter]
-print forest_test_feature_selection.shape
 
 #predict the labels
-ann_prediction=artificial_neural_net(number_features_after_feature_selection,\
-number_unique_labels, feature_selection_attributes_training, labels_training,\
-feature_selection_attributes_testing, labels_testing,\
-forest_test_feature_selection, accuracy=False, prediction=False)
+prediction=rf_feature_selection_rfecv.predict(forest_test_feature_selection)
 
-print ann_prediction
-np.savetxt("prediction.csv", ann_prediction, delimiter=",")
+np.savetxt("prediction.csv", prediction, delimiter=",")
